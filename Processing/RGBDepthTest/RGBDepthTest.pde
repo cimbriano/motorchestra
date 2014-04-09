@@ -20,6 +20,9 @@ void setup() {
   kinect.enableDepth(depth);
   kinect.enableRGB(rgb);
   kinect.enableIR(ir);
+  kinect.enableGesture();
+  kinect.enableHands();
+  kinect.addGesture("RaiseHand");
   kinect.tilt(deg);
 }
 
