@@ -19,6 +19,6 @@ void draw() {
 }
 
 void keyPressed() {
-  myPort.write(key);
+  myPort.write(key + "," + key + "\n");
   println("Key pressed: " + key);
 }
