@@ -13,12 +13,13 @@ void setup() {
   myPort = new Serial(this, "/dev/tty.usbmodemfa131", 9600);
 }
 
+
 void draw() {
   fill(0);
   rect(25, 25, 50, 50);
 }
 
 void keyPressed() {
-  myPort.write(key + "," + key + "\n");
-  println("Key pressed: " + key);
+  myPort.write(key + "," + key + '\n');
+  println(key + "," + key);
 }

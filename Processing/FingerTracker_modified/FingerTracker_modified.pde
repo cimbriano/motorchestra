@@ -85,6 +85,7 @@ void draw() {
   
   getTopFingers(fingers);
   writeThereminValues();
+  
 
   // show the threshold on the screen
   fill(255,0,0);
@@ -106,37 +107,36 @@ void keyPressed(){
 
 void writeThereminValues(){
   String out = "";
-  
+
 //  out += "Left top y: ";
   out += (topFingers[0].y == 9999) ? 0 : int(map(topFingers[0].y, 0, height, 10, 1));
   out += ",";
 //  out += " Right top y: ";
   out += (topFingers[1].y == 9999) ? 0 : int(map(topFingers[1].y, 0, height, 10, 1));
-  
-  myPort.write(out);
+
+  myPort.write(out + "\n");
   println(out);
 }
 
 void getTopFingers(FingerTracker fingers) {
   // Note:  "Top" in the image is the lowest y value.
-  
-  
+
   // Reset Left Finger
   topFingers[0].set(0,9999);
-  
+
   //Reset Right FInger
   topFingers[1].set(0,9999);
-  
+
   // Loop through this frame's fingeres
   for (int i = 0; i < fingers.getNumFingers(); i++) {
     PVector finger = fingers.getFinger(i);
     
     // Check if this is in the left or right of the image
     if(finger.x < (width / 2)) { // Left
-    
+
       if(finger.y < topFingers[0].y) {
         topFingers[0] = finger;
- 
+
       }
     } else { //Right
       if(finger.y < topFingers[1].y){
