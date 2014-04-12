@@ -10,7 +10,7 @@ void setup() {
   println(Serial.list());
 
   // Open the port you are using at the rate you want:
-  myPort = new Serial(this, "/dev/tty.usbmodemfa131", 9600);
+  myPort = new Serial(this, "/dev/tty.usbmodemfa131", 115200);
 }
 
 

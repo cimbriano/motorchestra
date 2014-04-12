@@ -23,7 +23,7 @@ int LED = 13;
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   
   pinMode(LED, OUTPUT);
   
@@ -37,10 +37,11 @@ void setup() {
   leftMotor->setSpeed(speeds[0]);
   rightMotor->setSpeed(speeds[1]);
   //END TEMP
+  
+  digitalWrite(LED, LOW);
 }
 
 void loop() {
-  digitalWrite(LED, LOW);
   
   setSpeeds();
   
@@ -72,15 +73,16 @@ void loop() {
 }
 
 void setSpeeds() {
-  if(Serial.available() > 0){
-    
     digitalWrite(LED, HIGH);
+    if(Serial.available() > 0){
+    
     
     in = Serial.readStringUntil('\n');
 //    L = Serial.read() - '0';
 //    R = Serial.read() - '0';
     
     digitalWrite(LED, LOW);
+    delay(500);
     // parse input string from format L,R where L and R are speeds between 0-9
     L = in.charAt(0) - '0';
     R = in.charAt(2) - '0';
@@ -88,4 +90,5 @@ void setSpeeds() {
     speeds[0] = (L == 0) ? 0 : MIN_SPEED + STEP_SIZE * (L - 1); // subtract 1 from value of L and R because speed 0 is off and
     speeds[1] = (R == 0) ? 0 : MIN_SPEED + STEP_SIZE * (R - 1); // speed 1 is  MIN_SPEED
   }
+  digitalWrite(LED, HIGH);
 }

@@ -18,8 +18,9 @@ PVector[] topFingers;
 int width = 640;
 int height = 480;
 
+int counter = 0;
 void setup() {
-  myPort = new Serial(this, "/dev/tty.usbmodemfa131", 9600);
+  myPort = new Serial(this, "/dev/tty.usbmodemfa131", 115200);
 
   size(width, height);
 
@@ -58,7 +59,7 @@ void draw() {
   // update the depth threshold beyond which
   // we'll look for fingers
   fingers.setThreshold(threshold);
-  
+
   // access the "depth map" from the Kinect
   // this is an array of ints with the full-resolution
   // depth data (i.e. 500-2047 instead of 0-255)
@@ -68,80 +69,87 @@ void draw() {
 
   // iterate over all the contours found
   // and display each of them with a green line
-  stroke(0,255,0);
+  stroke(0, 255, 0);
   for (int k = 0; k < fingers.getNumContours(); k++) {
     fingers.drawContour(k);
   }
-  
+
   // iterate over all the fingers found
   // and draw them as a red circle
   noStroke();
-  fill(255,0,0);
+  fill(255, 0, 0);
   for (int i = 0; i < fingers.getNumFingers(); i++) {
     PVector position = fingers.getFinger(i);
 
     ellipse(position.x - 5, position.y -5, 10, 10);
   }
-  
+
   getTopFingers(fingers);
   writeThereminValues();
   
 
+
   // show the threshold on the screen
-  fill(255,0,0);
+  fill(255, 0, 0);
   text(threshold, 10, 20);
 }
 
 // keyPressed event:
 // pressing the '-' key lowers the threshold by 10
 // pressing the '+/=' key increases it by 10 
-void keyPressed(){
-  if(key == '-'){
+void keyPressed() {
+  if (key == '-') {
     threshold -= 10;
   }
-  
-  if(key == '='){
+  else if (key == '=') {
     threshold += 10;
+  }
+  else {
+    myPort.write(key + "," + key + '\n');
+    println(key + "," + key);
   }
 }
 
-void writeThereminValues(){
+void writeThereminValues() {
   String out = "";
 
-//  out += "Left top y: ";
-  out += (topFingers[0].y == 9999) ? 0 : int(map(topFingers[0].y, 0, height, 10, 1));
+  println("Left top finger: " + ((topFingers[0].y == 9999) ? 0 : int(map(topFingers[0].y, 0, height, 10, 1))));
+  //  out += "Left top y: ";
+  int L =  (topFingers[0].y == 9999) ? 0 : int(map(topFingers[0].y, 0, height, 10, 1));
   out += ",";
-//  out += " Right top y: ";
-  out += (topFingers[1].y == 9999) ? 0 : int(map(topFingers[1].y, 0, height, 10, 1));
+  //  out += " Right top y: ";
+  int R =  (topFingers[1].y == 9999) ? 0 : int(map(topFingers[1].y, 0, height, 10, 1));
 
-  myPort.write(out + "\n");
-  println(out);
+  println("Right top finger: " + ((topFingers[1].y == 9999) ? 0 : int(map(topFingers[1].y, 0, height, 10, 1))));
+  myPort.write(L + "," + R + '\n');
+  println(L + "," + R);
 }
 
 void getTopFingers(FingerTracker fingers) {
   // Note:  "Top" in the image is the lowest y value.
 
   // Reset Left Finger
-  topFingers[0].set(0,9999);
+  topFingers[0].set(0, 9999);
 
   //Reset Right FInger
-  topFingers[1].set(0,9999);
+  topFingers[1].set(0, 9999);
 
   // Loop through this frame's fingeres
   for (int i = 0; i < fingers.getNumFingers(); i++) {
     PVector finger = fingers.getFinger(i);
-    
+
     // Check if this is in the left or right of the image
-    if(finger.x < (width / 2)) { // Left
+    if (finger.x < (width / 2)) { // Left
 
-      if(finger.y < topFingers[0].y) {
+      if (finger.y < topFingers[0].y) {
         topFingers[0] = finger;
-
       }
-    } else { //Right
-      if(finger.y < topFingers[1].y){
+    } 
+    else { //Right
+      if (finger.y < topFingers[1].y) {
         topFingers[1] = finger;
       }
     }
   }
 }
+
