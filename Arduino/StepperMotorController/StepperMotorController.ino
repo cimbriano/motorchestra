@@ -14,12 +14,15 @@ const int STEP_INCREMENT = 2;
 int* speeds;
 
 String in;
+int commaIndex= -1;
+char charBuffer[5];
+
 
 
 int L = 0;
 int R = 0;
 
-int LED = 13;
+int LED = 9;
 
 
 void setup() {
@@ -38,7 +41,7 @@ void setup() {
   rightMotor->setSpeed(speeds[1]);
   //END TEMP
   
-  digitalWrite(LED, LOW);
+  analogWrite(LED, 0);
 }
 
 void loop() {
@@ -73,22 +76,26 @@ void loop() {
 }
 
 void setSpeeds() {
-    digitalWrite(LED, HIGH);
+
     if(Serial.available() > 0){
+
     
-    
-    in = Serial.readStringUntil('\n');
-//    L = Serial.read() - '0';
-//    R = Serial.read() - '0';
-    
-    digitalWrite(LED, LOW);
-    delay(500);
-    // parse input string from format L,R where L and R are speeds between 0-9
-    L = in.charAt(0) - '0';
-    R = in.charAt(2) - '0';
-  
-    speeds[0] = (L == 0) ? 0 : MIN_SPEED + STEP_SIZE * (L - 1); // subtract 1 from value of L and R because speed 0 is off and
-    speeds[1] = (R == 0) ? 0 : MIN_SPEED + STEP_SIZE * (R - 1); // speed 1 is  MIN_SPEED
+      in = Serial.readStringUntil('\n');
+      commaIndex = in.indexOf(',');
+      
+      in.substring(0, commaIndex).toCharArray(charBuffer, 5);
+      L = atoi(charBuffer);
+      
+      in.substring(commaIndex + 1).toCharArray(charBuffer, 5);
+      R = atoi(charBuffer);
+      
+//      speeds[0] = (L == 0) ? 0 : MIN_SPEED + STEP_SIZE * (L - 1); // subtract 1 from value of L and R because speed 0 is off and
+//      speeds[1] = (R == 0) ? 0 : MIN_SPEED + STEP_SIZE * (R - 1); // speed 1 is  MIN_SPEED
+
+      speeds[0] = L; // subtract 1 from value of L and R because speed 0 is off and
+      speeds[1] = R; // speed 1 is  MIN_SPEED
+      
+      analogWrite(LED, map(speeds[0], 0, 2000, 0, 255));
   }
-  digitalWrite(LED, HIGH);
+
 }

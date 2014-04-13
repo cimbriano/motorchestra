@@ -5,6 +5,9 @@ import processing.serial.*;
 // The serial port:
 Serial myPort;
 
+String buffer = "";
+int currentSpeed = 0;
+
 void setup() {
   // List all the available serial ports:
   println(Serial.list());
@@ -20,6 +23,41 @@ void draw() {
 }
 
 void keyPressed() {
-  myPort.write(key + "," + key + '\n');
-  println(key + "," + key);
+  int keyInt = key;
+  
+  if(keyInt == 10) {
+    // Send something to 
+     myPort.write(buffer + "," + buffer + '\n');
+     print(buffer + "," + buffer + '\n');
+     
+    // Clear the buffer
+    currentSpeed = Integer.parseInt(buffer);
+    buffer = "";
+    
+  } else if(key == CODED) {
+    if(keyCode == UP) {
+      currentSpeed += 10;
+    } else if(keyCode == DOWN) {
+      currentSpeed -= 10;
+    } else if(keyCode == LEFT) {
+      currentSpeed += 1;
+    } else if(keyCode == RIGHT){
+      currentSpeed -= 1;
+    }
+    
+     myPort.write(currentSpeed + "," + currentSpeed + '\n');
+     print(currentSpeed + "," + currentSpeed + '\n');
+  } else if(key == '\\') { // ESC
+    // Clear the buffer
+    buffer = "";
+    println("Buffer :" + buffer);
+    
+  } else {
+    //Store this character in the buffer
+    buffer += key;
+    println("Buffer :" + buffer);
+  }
+  
+  
+ 
 }
