@@ -6,7 +6,9 @@ import processing.serial.*;
 Serial myPort;
 
 String buffer = "";
-int currentSpeed = 0;
+int currentSpeedLeft = -1;
+int currentSpeedRight = -1;
+int commaIndex = -1;
 
 void setup() {
   // List all the available serial ports:
@@ -27,26 +29,32 @@ void keyPressed() {
   
   if(keyInt == 10) {
     // Send something to 
-     myPort.write(buffer + "," + buffer + '\n');
-     print(buffer + "," + buffer + '\n');
+     myPort.write(buffer + '\n');
+     print(buffer + '\n');
      
-    // Clear the buffer
-    currentSpeed = Integer.parseInt(buffer);
+    // Parse speeds and clear the buffer
+    commaIndex = buffer.indexOf(",");
+    currentSpeedLeft = Integer.parseInt(buffer.substring(0, commaIndex));
+    currentSpeedRight = Integer.parseInt(buffer.substring(commaIndex+1));
     buffer = "";
     
   } else if(key == CODED) {
     if(keyCode == UP) {
-      currentSpeed += 10;
+      currentSpeedLeft += 10;
+      currentSpeedRight += 10;
     } else if(keyCode == DOWN) {
-      currentSpeed -= 10;
-    } else if(keyCode == LEFT) {
-      currentSpeed += 1;
-    } else if(keyCode == RIGHT){
-      currentSpeed -= 1;
+      currentSpeedLeft -= 10;
+      currentSpeedRight -= 10;
+    } else if(keyCode == RIGHT) {
+      currentSpeedLeft += 1;
+      currentSpeedRight += 1;
+    } else if(keyCode == LEFT){
+      currentSpeedLeft -= 1;
+      currentSpeedRight -= 1;
     }
     
-     myPort.write(currentSpeed + "," + currentSpeed + '\n');
-     print(currentSpeed + "," + currentSpeed + '\n');
+     myPort.write(currentSpeedLeft + "," + currentSpeedRight + '\n');
+     print(currentSpeedLeft + "," + currentSpeedRight + '\n');
   } else if(key == '\\') { // ESC
     // Clear the buffer
     buffer = "";
