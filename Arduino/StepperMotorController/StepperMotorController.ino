@@ -46,7 +46,7 @@ void loop() {
   analogWrite(rightMotor, speeds[1]);
   leftMotor->setSpeed(speeds[0]);
   if(speeds[0] > 0) {
-    leftMotor->onestep(FORWARD, DOUBLE);  
+    leftMotor->step(1, FORWARD, DOUBLE);  
   }
 }
 

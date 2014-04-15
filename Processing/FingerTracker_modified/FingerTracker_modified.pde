@@ -22,6 +22,7 @@ int counter = 0;
 int currentSpeedLeft = -1;
 int currentSpeedRight = -1;
 
+int[] notes = {0, 110, 220, 330, 440, 550, 660, 770, 880, 990};
 void setup() {
   myPort = new Serial(this, "/dev/tty.usbmodemfa131", 115200);
 //
@@ -130,7 +131,9 @@ void keyPressed() {
 //
 void writeThereminValues(int counter) {
   
-  boolean sendNum = counter % 150 == 0;
+//  boolean sendNum = counter % 150 == 0;
+    boolean sendNum = true;
+
 //  String out = "";
 //  //  out += "Left top y: ";
   int L =  (topFingers[0].y == 9999) ? 0 : int(map(topFingers[0].y, 0, height, 10, 1));
@@ -141,8 +144,8 @@ void writeThereminValues(int counter) {
   println("Right top finger: " + R);
   
   if(sendNum && currentSpeedLeft != L || currentSpeedRight != R) {
-    myPort.write(L + "," + L + "\n");
-    print(L + "," + L + "\n");
+    myPort.write(notes[L] + "," + notes[R] + "\n");
+    print(L + " : " + notes[L] + ", " + R + " : " + notes[R] + '\n');
     currentSpeedLeft = L;
     currentSpeedRight = R;
   }

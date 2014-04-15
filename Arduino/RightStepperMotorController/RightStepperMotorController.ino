@@ -14,6 +14,7 @@ int speedIn = 1;
 int R;
 
 void setup() {
+  Serial.begin(9600);
   AFMS.begin();
   
   R = 80;
@@ -23,10 +24,10 @@ void setup() {
 
 void loop() {
   R = analogRead(speedIn);
-  println(R);
+  Serial.println(R);
 
   // set motor speed
-  rightMotor->setSpeed(R);
+//  rightMotor->setSpeed(R);
   
   // run motor
   if(R > 0) {
