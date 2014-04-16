@@ -4,7 +4,8 @@ import fingertracker.*;
 import SimpleOpenNI.*;
 import processing.serial.*;
 
-Serial myPort;
+Serial myPortLeft;
+Serial myPortRight;
 
 //// declare FignerTracker and SimpleOpenNI objects
 FingerTracker fingers;
@@ -22,9 +23,10 @@ int counter = 0;
 int currentSpeedLeft = -1;
 int currentSpeedRight = -1;
 
-int[] notes = {0, 110, 220, 330, 440, 550, 660, 770, 880, 990};
+int[] notes = {0, 120, 150, 214, 272, 300, 428, 500, 601, 1501};
 void setup() {
-  myPort = new Serial(this, "/dev/tty.usbmodemfa131", 115200);
+  myPortLeft = new Serial(this, "/dev/tty.usbmodemfd12241", 115200);
+  myPortRight = new Serial(this, "/dev/tty.usbmodemfd12221", 115200);
 //
   size(width, height);
 //
@@ -116,7 +118,7 @@ void keyPressed() {
   else {
     
     if(currentSpeedLeft != keyInt || currentSpeedRight != keyInt) {
-      myPort.write(keyInt + "," + keyInt + '\n');
+      myPortLeft.write(keyInt + "," + keyInt + '\n');
       print(keyInt + "," + keyInt + '\n');
       
       currentSpeedLeft = keyInt;
@@ -130,29 +132,28 @@ void keyPressed() {
 }
 //
 void writeThereminValues(int counter) {
-  
-//  boolean sendNum = counter % 150 == 0;
-    boolean sendNum = true;
 
-//  String out = "";
-//  //  out += "Left top y: ";
   int L =  (topFingers[0].y == 9999) ? 0 : int(map(topFingers[0].y, 0, height, 10, 1));
   println("Left top finger: " + L);
-//  out += ",";
-//  //  out += " Right top y: ";
   int R =  (topFingers[1].y == 9999) ? 0 : int(map(topFingers[1].y, 0, height, 10, 1));
   println("Right top finger: " + R);
   
-  if(sendNum && currentSpeedLeft != L || currentSpeedRight != R) {
-    myPort.write(notes[L] + "," + notes[R] + "\n");
-    print(L + " : " + notes[L] + ", " + R + " : " + notes[R] + '\n');
+  if(currentSpeedLeft != L) {
+    myPortLeft.write(notes[L] + "\n");
+    print("L : " + notes[L] + "\n");
+    
     currentSpeedLeft = L;
+  }
+  
+  if(currentSpeedRight != R){
+    myPortRight.write(R + "\n");
+    print("R: " + R + "\n");
+    
     currentSpeedRight = R;
   }
-  else {
-    println("Speeds have not changes. Not sending to serial.");
-  }
+  
 }
+
 //
 void getTopFingers(FingerTracker fingers) {
   // Note:  "Top" in the image is the lowest y value.

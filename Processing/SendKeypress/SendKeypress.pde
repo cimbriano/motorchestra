@@ -3,7 +3,8 @@
 import processing.serial.*;
 
 // The serial port:
-Serial myPort;
+Serial myPortLeft;
+Serial myPortRight;
 
 String buffer = "";
 int currentSpeedLeft = -1;
@@ -15,7 +16,8 @@ void setup() {
   println(Serial.list());
 
   // Open the port you are using at the rate you want:
-  myPort = new Serial(this, "/dev/tty.usbmodemfa131", 115200);
+  myPortLeft = new Serial(this, "/dev/tty.usbmodemfd12241", 115200);
+  myPortRight = new Serial(this, "/dev/tty.usbmodemfd12221", 115200);
 }
 
 
@@ -26,46 +28,52 @@ void draw() {
 
 void keyPressed() {
   int keyInt = key;
-  
-  if(keyInt == 10) {
-    // Send something to 
-     myPort.write(buffer + '\n');
-     print(buffer + '\n');
-     
+
+  if (keyInt == 10) {
     // Parse speeds and clear the buffer
     commaIndex = buffer.indexOf(",");
     currentSpeedLeft = Integer.parseInt(buffer.substring(0, commaIndex));
     currentSpeedRight = Integer.parseInt(buffer.substring(commaIndex+1));
-    buffer = "";
+
+    myPortLeft.write(currentSpeedLeft + "\n");
+    myPortRight.write(currentSpeedRight + "\n");
     
-  } else if(key == CODED) {
-    if(keyCode == UP) {
+    print(buffer + '\n');
+    
+    buffer = "";
+  } 
+  else if (key == CODED) {
+    if (keyCode == UP) {
       currentSpeedLeft += 10;
       currentSpeedRight += 10;
-    } else if(keyCode == DOWN) {
+    } 
+    else if (keyCode == DOWN) {
       currentSpeedLeft -= 10;
       currentSpeedRight -= 10;
-    } else if(keyCode == RIGHT) {
+    } 
+    else if (keyCode == RIGHT) {
       currentSpeedLeft += 1;
       currentSpeedRight += 1;
-    } else if(keyCode == LEFT){
+    } 
+    else if (keyCode == LEFT) {
       currentSpeedLeft -= 1;
       currentSpeedRight -= 1;
     }
-    
-     myPort.write(currentSpeedLeft + "," + currentSpeedRight + '\n');
-     print(currentSpeedLeft + "," + currentSpeedRight + '\n');
-  } else if(key == '\\') { // ESC
+
+    myPortLeft.write(currentSpeedLeft + "\n");
+    myPortRight.write(currentSpeedRight + "\n");
+
+    print(currentSpeedLeft + "," + currentSpeedRight + '\n');
+  } 
+  else if (key == '\\') { // ESC
     // Clear the buffer
     buffer = "";
     println("Buffer :" + buffer);
-    
-  } else {
+  } 
+  else {
     //Store this character in the buffer
     buffer += key;
     println("Buffer :" + buffer);
   }
-  
-  
- 
 }
+
