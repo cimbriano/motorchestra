@@ -23,9 +23,12 @@ int counter = 0;
 int currentSpeedLeft = -1;
 int currentSpeedRight = -1;
 
+String[] noteNames = {"OFF", "C#", "D#", "F", "F#", "G", "G#", "A#", "B", "C"};
 int[] notes = {
   0, 92, 118, 163, 197, 225, 273, 685, 1055, 3010
 };
+
+PFont notesFont;
 void setup() {
    println(Serial.list());
   
@@ -55,6 +58,7 @@ void setup() {
   topFingers = new PVector[2];
   topFingers[0] = new PVector();
   topFingers[1] = new PVector();
+  notesFont = createFont("Courier New", 50, false);
 }
 //
 void draw() {
@@ -99,8 +103,10 @@ void draw() {
   //delay(250);
 
   // show the threshold value on the screen
-  fill(255, 0, 0);
-  text(threshold, 10, 20);
+  //fill(255, 0, 0);
+  //text(threshold, 10, 20);
+  
+  drawNotes();
 }
 
 void drawPressedBoxes() {
@@ -132,6 +138,15 @@ void drawGridLines() {
   }
 
   line(width / 2, 0, width / 2, height);
+}
+
+void drawNotes() {
+  textFont(notesFont);
+  fill(255, 255, 255, 153);
+  for (int i = 1; i < noteNames.length; i++) {
+    text(noteNames[i], 4, (10-i)*height/9-10);
+    text(i, width-45, (10-i)*height/9-10);
+  }
 }
 
 // keyPressed event:
