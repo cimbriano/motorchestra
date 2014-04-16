@@ -13,7 +13,7 @@ SimpleOpenNI kinect;
 //
 //// set a default threshold distance:
 //// 625 corresponds to about 2-3 feet from the Kinect
-int threshold = 625;
+int threshold = 745;
 PVector[] topFingers;
 //
 int width = 640;
@@ -23,17 +23,19 @@ int counter = 0;
 int currentSpeedLeft = -1;
 int currentSpeedRight = -1;
 
-int[] notes = {0, 120, 150, 214, 272, 300, 428, 500, 601, 1501};
+int[] notes = {
+  0, 92, 118, 163, 197, 225, 273, 685, 1055, 3010
+};
 void setup() {
+   println(Serial.list());
+  
   myPortLeft = new Serial(this, "/dev/tty.usbmodemfd12241", 115200);
   myPortRight = new Serial(this, "/dev/tty.usbmodemfd12221", 115200);
-//
+  //
   size(width, height);
-//
-//
-//
-//  // initialize your SimpleOpenNI object
-//  // and set it up to access the depth image
+
+  //  // initialize your SimpleOpenNI object
+  //  // and set it up to access the depth image
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
   // mirror the depth image so that it is more natural
@@ -61,6 +63,7 @@ void draw() {
   // get a depth image and display it
   PImage depthImage = kinect.depthImage();
   image(depthImage, 0, 0);
+  tint(255, 225, 0);
 
   // update the depth threshold beyond which
   // we'll look for fingers
@@ -73,6 +76,8 @@ void draw() {
   int[] depthMap = kinect.depthMap();
   fingers.update(depthMap);
 
+  drawGridLines();
+
   // iterate over all the contours found
   // and display each of them with a green line
   stroke(0, 255, 0);
@@ -80,26 +85,53 @@ void draw() {
     fingers.drawContour(k);
   }
 
-  // iterate over all the fingers found
-  // and draw them as a red circle
-  noStroke();
-  fill(255, 0, 0);
-  for (int i = 0; i < fingers.getNumFingers(); i++) {
-    PVector position = fingers.getFinger(i);
-
-    ellipse(position.x - 5, position.y -5, 10, 10);
-  }
-//
+  // Get the topFingers
   getTopFingers(fingers);
-  writeThereminValues(counter);
-  counter++;
+
+  getCurrentSpeeds();
+
+  // iterate over the top fingers on each side
+  // and draw them as a red circle
+  writeThereminValues();
+
+  // Acutate the "Pressed" boxes ( or put a circle in the center of the box)
+  drawPressedBoxes();
   //delay(250);
-  
 
-
-  // show the threshold on the screen
+  // show the threshold value on the screen
   fill(255, 0, 0);
   text(threshold, 10, 20);
+}
+
+void drawPressedBoxes() {
+
+  // Draws tracked fingers
+  noStroke();
+  fill(255, 0, 0);
+  for (int i = 0; i < topFingers.length; i++) {
+    PVector position = topFingers[i];
+    ellipse(position.x - 5, position.y -5, 10, 10);
+  }
+
+  // Highlight the box
+  noStroke();
+  fill(200, 200, 200, 80.0);
+  // Left side highlighting
+  rect(0, (height / 9) * (9 - currentSpeedLeft), width / 2, height / 9);
+
+  //Right side highlighting
+  rect(width / 2, (height / 9) * (9 - currentSpeedRight), width / 2, height / 9);
+}
+
+void drawGridLines() {
+  // Set color of grid lines
+  strokeWeight(1);
+  stroke(255, 255, 255, 127.0);
+  for (int line_height = 0; line_height < height; line_height += height / 9 ) {
+    line(0, line_height, width, line_height);
+  }
+
+  line(width / 2, 0, width / 2, height);
 }
 
 // keyPressed event:
@@ -107,51 +139,61 @@ void draw() {
 // pressing the '+/=' key increases it by 10 
 void keyPressed() {
   int keyInt = key - '0';  
-//  println("Key:" + key + ", keyInt: " + keyInt, );
-  
+  //  println("Key:" + key + ", keyInt: " + keyInt, );
+
   if (key == '-') {
-//    threshold -= 10;
+    threshold -= 10;
   }
   else if (key == '=') {
-//    threshold += 10;
+    threshold += 10;
   }
   else {
-    
-    if(currentSpeedLeft != keyInt || currentSpeedRight != keyInt) {
+
+    if (currentSpeedLeft != keyInt || currentSpeedRight != keyInt) {
       myPortLeft.write(keyInt + "," + keyInt + '\n');
       print(keyInt + "," + keyInt + '\n');
-      
+
       currentSpeedLeft = keyInt;
       currentSpeedRight = keyInt;
-    } else {
+    } 
+    else {
       println("Speed still: " + currentSpeedLeft + ". Not sending to Serial.");
     }
-    
-    
   }
 }
+
+void getCurrentSpeeds() {
+}
 //
-void writeThereminValues(int counter) {
+void writeThereminValues() {
 
   int L =  (topFingers[0].y == 9999) ? 0 : int(map(topFingers[0].y, 0, height, 10, 1));
-  println("Left top finger: " + L);
+  //  println("L: " + L);
   int R =  (topFingers[1].y == 9999) ? 0 : int(map(topFingers[1].y, 0, height, 10, 1));
-  println("Right top finger: " + R);
-  
-  if(currentSpeedLeft != L) {
+  //  println("R: " + R);
+
+  if (currentSpeedLeft != L) {
+    
+    // Regular mode
     myPortLeft.write(notes[L] + "\n");
-    print("L : " + notes[L] + "\n");
     
+    // Rhythm mode
+//    myPortLeft.write(L + "\n");
+    
+    
+    //    print("L : " + notes[L] + "\n");
+
     currentSpeedLeft = L;
+    println("L: " + L);
   }
-  
-  if(currentSpeedRight != R){
+
+  if (currentSpeedRight != R) {
     myPortRight.write(R + "\n");
-    print("R: " + R + "\n");
-    
+    //    print("R: " + R + "\n");
+    println("R: " + R);
+
     currentSpeedRight = R;
   }
-  
 }
 
 //
